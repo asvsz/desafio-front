@@ -1,4 +1,15 @@
 'use client'
+interface Mensalidade {
+  id_mensalidade: number;
+  parcela: number;
+  referencia: string;
+  valor_principal: number | string;
+  status: 'A' | 'P';
+}
+
+interface AcordoMensalidade {
+  mensalidade: Mensalidade; 
+}
 
 interface Acordo {
   id_acordo: number;
@@ -10,8 +21,8 @@ interface Acordo {
   descricao?: string | null;
   metodo_pag?: string | null;
   dt_pgto?: string | null;
+  mensalidades: AcordoMensalidade[];
 }
-
 interface DetalhesAcordoProps {
   acordo: Acordo;
 }
@@ -61,6 +72,28 @@ const DetalhesAcordo = ({ acordo }: DetalhesAcordoProps) => {
           <h3 className="text-sm font-medium text-gray-500">Método de Pagamento</h3>
           <p className="mt-1 text-base text-gray-800">{acordo.metodo_pag || '-'}</p>
         </div>
+      </div>
+      <div className="pt-4 border-t">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Mensalidades Incluídas no Acordo
+        </h3>
+        <ul className="divide-y divide-gray-200 rounded-md border">
+          {acordo.mensalidades.map(({ mensalidade }) => (
+            <li key={mensalidade.id_mensalidade} className="p-3 flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium text-gray-800">
+                  Parcela {mensalidade.parcela} ({mensalidade.referencia})
+                </p>
+                <p className={`text-xs ${mensalidade.status === 'P' ? 'text-green-600' : 'text-red-600'}`}>
+                  Status: {mensalidade.status === 'P' ? 'Pago' : 'Aberto'}
+                </p>
+              </div>
+              <p className="text-sm font-semibold">
+                {formatarValor(mensalidade.valor_principal)}
+              </p>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   )
