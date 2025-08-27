@@ -1,5 +1,16 @@
 'use client';
 
+interface Acordo{
+  id_acordo: number;
+  status: 'Aberto' | 'Quebra' | 'Concluído';
+  total_acordo: number | string;
+  data_prevista: string;
+}
+
+interface AcordoMensalidade{
+  acordo: Acordo
+}
+
 interface Mensalidade {
   id_mensalidade: number;
   parcela: number | string;
@@ -13,6 +24,7 @@ interface Mensalidade {
   status: 'A' | 'P';
   referencia: string;
   form_pagto?: string | null; 
+  acordos: AcordoMensalidade[];
 }
 
 interface DetalhesMensalidadeProps {
@@ -81,6 +93,32 @@ const DetalhesMensalidade = ({ mensalidade }: DetalhesMensalidadeProps) => {
           <h3 className="text-sm font-medium text-gray-500">Cobrança</h3>
           <p className="mt-1 text-base text-gray-800">{formatarData(mensalidade.cobranca)}</p>
         </div>
+      </div>
+      <div className="pt-4 border-t">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Acordos que Mensalidade está associada
+        </h3>
+        <ul className="divide-y divide-gray-200 rounded-md border">
+          {mensalidade.acordos.map(({ acordo }) => (
+            <li key={acordo.id_acordo} className="p-3 flex justify-between items-center">
+              <div>
+                <p className="text-sm font-medium text-gray-800">
+                  Total do Acordo: {acordo.total_acordo}
+                </p>
+                <p className="text-sm font-medium text-gray-800">
+                  Data Prevista: {formatarData(acordo.data_prevista)}
+                </p>
+                <p className={`text-xs ${acordo.status === 'Concluído' ? 'text-green-600'
+                  : acordo.status === 'Quebra' ? 'text-red-600' : 'text-blue-800'}`}>
+                  Status: {acordo.status}
+                </p>
+              </div>
+              <p className="text-sm font-semibold">
+                {formatarValor(acordo.total_acordo)}
+              </p>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
