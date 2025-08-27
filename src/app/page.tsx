@@ -97,7 +97,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border bg-white">
+        <div className="overflow-x-auto rounded-lg border bg-white items-center">
           <table className="min-w-full">
             <thead className="bg-gray-50">
               <tr>

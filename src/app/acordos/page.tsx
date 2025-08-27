@@ -66,12 +66,16 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
       <Navbar />
-      <main>
-        <h2 className="text-xl text-gray-600 font-semibold mb-2 container mx-auto px-1 py-1">Acordos</h2>
-        <p className="text-gray-600 mb-4 container mx-auto px-1 py-1">Lista de todas os acordos e seus status.</p>
+      <main className="container mx-auto p-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-700">Acordos</h2>
+            <p className="text-gray-600">Lista de todas os acordos e seus status.</p>
+          </div>
+        </div>
 
-        <div className="overflow-x-auto rounded-lg border container mx-auto px-1 py-1">
-          <table>
+        <div className="overflow-x-auto rounded-lg border bg-white items-center">
+          <table className="min-w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="p-4 text-left text-sm font-semibold text-gray-600">Número do Acordo</th>
@@ -80,6 +84,7 @@ export default function Home() {
                 <th className="p-4 text-left text-sm font-semibold text-gray-600">Data Prevista</th>
                 <th className="p-4 text-left text-sm font-semibold text-gray-600">Realizado Por</th>
                 <th className="p-4 text-left text-sm font-semibold text-gray-600">Data de Criação</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-600">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
