@@ -8,6 +8,17 @@ import FormularioCriarAcordo from "@/features/acordos/components/FormularioCriar
 import { useRouter } from "next/navigation";
 import DetalhesMensalidade from "@/features/mensalidades/components/DetalhesMensalidade";
 
+interface Acordo {
+  id_acordo: number;
+  status: 'Aberto' | 'Quebra' | 'Concluído';
+  total_acordo: number | string;
+  data_prevista: string;
+}
+
+interface AcordoMensalidade {
+  acordo: Acordo
+}
+
 interface Mensalidade {
   id_mensalidade: number;
   parcela: number;
@@ -21,6 +32,7 @@ interface Mensalidade {
   status: 'A' | 'P'; 
   referencia: string;
   form_pagto?: string | null; 
+  acordos: AcordoMensalidade[];
   [key: string]: any; 
 }
 

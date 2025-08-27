@@ -8,6 +8,17 @@ import FormularioCriarAcordo from "@/features/acordos/components/FormularioCriar
 import { useRouter } from "next/navigation";
 import DetalhesAcordo from "@/features/acordos/components/DetalhesAcordo";
 
+interface Mensalidade {
+  id_mensalidade: number;
+  parcela: number;
+  referencia: string;
+  valor_principal: number | string;
+  status: 'A' | 'P';
+}
+
+interface AcordoMensalidade {
+  mensalidade: Mensalidade;
+}
 interface Acordos {
   id_acordo: number;
   status: 'Aberto' | 'Quebra' | 'Concluído'; 
@@ -18,6 +29,7 @@ interface Acordos {
   descricao?: string | null;
   metodo_pag?: string | null;
   dt_pgto?: string | null;
+  mensalidades: AcordoMensalidade[];
 }
 
 export default function Home() {
