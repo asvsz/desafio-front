@@ -7,6 +7,7 @@ import { useModalStore } from "@/stores/modalStore";
 import FormularioCriarAcordo from "@/features/acordos/components/FormularioCriarAcordo";
 import { useRouter } from "next/navigation";
 import DetalhesMensalidade from "@/features/mensalidades/components/DetalhesMensalidade";
+import ConfirmacaoModal from "@/components/ui/ConfirmacaoModal";
 
 interface Acordo {
   id_acordo: number;
@@ -45,6 +46,9 @@ export default function Home() {
   const [modalDetalhesAberto, setModalDetalhesAberto] = useState(false);
   const [mensalidadeSelecionada, setMensalidadeSelecionada] = useState<Mensalidade | null>(null);
 
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [mensalidadeParaPagar, setMensalidadeParaPagar] = useState<Mensalidade | null>(null);
+  
   const fetchMensalidades = async () => {
     try {
       setIsLoading(true);
@@ -77,21 +81,28 @@ export default function Home() {
     fetchMensalidades();
   };
 
-  const handlePagar = async (mensalidade: Mensalidade) => {
-    if (!window.confirm(`Deseja realmente pagar a parcela ${mensalidade.parcela}?`)) {
-      return;
-    }
+  const handleAbrirConfirmacaoPagamento = (mensalidade: Mensalidade) => {
+    setMensalidadeParaPagar(mensalidade); 
+    setIsConfirmModalOpen(true); 
+  };
+
+  const handleConfirmarPagamento = async () => {
+    if (!mensalidadeParaPagar) return;
+
     try {
-      await api.patch(`/mensalidades/${mensalidade.id_mensalidade}/pagar`, {
-        valor_pago: mensalidade.valor_principal,
+      await api.patch(`/mensalidades/${mensalidadeParaPagar.id_mensalidade}/pagar`, {
+        valor_pago: mensalidadeParaPagar.valor_principal,
         form_pagto: 'Manual',
       });
       alert('Pagamento registrado com sucesso!');
-      fetchMensalidades();
+      fetchMensalidades(); 
     } catch (error) {
       alert('Erro ao registrar o pagamento.');
       console.error(error);
     }
+
+
+    setMensalidadeParaPagar(null);
   };
 
   if (isLoading) return <p className="text-center mt-8">Carregando...</p>;
@@ -138,7 +149,7 @@ export default function Home() {
                     <div className="flex flex-col items-start gap-y-1">
                       {m.status === 'A' && (
                         <button
-                          onClick={() => handlePagar(m)}
+                          onClick={() => handleAbrirConfirmacaoPagamento(m)}
                           className="text-green-600 hover:underline"
                         >
                           Pagar
@@ -162,6 +173,14 @@ export default function Home() {
       <Modal isOpen={isCreateAgreementModalOpen} onClose={closeCreateAgreementModal} title="Criar Novo Acordo">
         <FormularioCriarAcordo onAcordoCriado={handleAcordoCriado} />
       </Modal>
+
+      <ConfirmacaoModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleConfirmarPagamento}
+        title="Confirmar Pagamento"
+        description={`Você tem certeza que deseja registrar o pagamento da parcela ${mensalidadeParaPagar?.parcela}?`}
+      />
 
       <Modal isOpen={modalDetalhesAberto} onClose={handleFecharDetalhes} title={`Detalhes da Mensalidade #${mensalidadeSelecionada?.id_mensalidade}`}>
         {mensalidadeSelecionada &&
