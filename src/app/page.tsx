@@ -33,7 +33,6 @@ interface Mensalidade {
   referencia: string;
   form_pagto?: string | null; 
   acordos: AcordoMensalidade[];
-  [key: string]: any; 
 }
 
 export default function Home() {
