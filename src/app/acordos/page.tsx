@@ -1,5 +1,4 @@
 'use client'
-import Image from "next/image";
 import Navbar from "@/components/layout/Navbar";
 import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
@@ -7,27 +6,40 @@ import { useModalStore } from "@/stores/modalStore";
 import Modal from "@/components/ui/Modal";
 import FormularioCriarAcordo from "@/features/acordos/components/FormularioCriarAcordo";
 import { useRouter } from "next/navigation";
+import DetalhesAcordo from "@/features/acordos/components/DetalhesAcordo";
 
-interface Installments {
-
-  id_mensalidade: number;
-  parcela: number;
-  referencia: string;
-  vencimento: string;
-  valor_principal: number | string;
-  status: 'A' | 'P';
-  data_pgto: string | null;
-
+interface Acordos {
+  id_acordo: number;
+  status: 'Aberto' | 'Quebra' | 'Concluído'; 
+  total_acordo: number | string;
+  data_prevista: string;
+  realizado_por: string;
+  dt_criacao: string;
+  descricao?: string | null;
+  metodo_pag?: string | null;
+  dt_pgto?: string | null;
 }
 
 export default function Home() {
 
-  const [mensalidades, setMensalidades] = useState<Installments[]>([])
+  const [acordos, setAcordos] = useState<Acordos[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { isCreateAgreementModalOpen, closeCreateAgreementModal } = useModalStore()
   const router = useRouter()
 
+  const [modalDetalhesAberto, setModalDetalhesAberto] = useState(false);
+  const [acordoSelecionado, setAcordoSelecionado] = useState<Acordos | null>(null);
+
+  const handleVerDetalhes = (acordo: Acordos) => {
+    setAcordoSelecionado(acordo);
+    setModalDetalhesAberto(true);
+  };
+
+  const handleFecharDetalhes = () => {
+    setModalDetalhesAberto(false);
+    setAcordoSelecionado(null);
+  };
 
   const handleAcordoCriado = () => {
     router.refresh()
@@ -36,8 +48,8 @@ export default function Home() {
     const buscarInstallments = async () => {
       try {
         setIsLoading(true)
-        const resposta = await api.get('/mensalidades');
-        setMensalidades(resposta.data)
+        const resposta = await api.get('/acordos');
+        setAcordos(resposta.data)
         setError(null)
       } catch (err) {
         setError('Falha ao carregar as mensalidades.')
@@ -55,48 +67,61 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 font-sans">
       <Navbar />
       <main>
-        <h2 className="text-xl text-gray-600 font-semibold mb-2 container mx-auto px-1 py-1">Mensalidades</h2>
-        <p className="text-gray-600 mb-4 container mx-auto px-1 py-1">Lista de todas as mensalidades e seus status.</p>
+        <h2 className="text-xl text-gray-600 font-semibold mb-2 container mx-auto px-1 py-1">Acordos</h2>
+        <p className="text-gray-600 mb-4 container mx-auto px-1 py-1">Lista de todas os acordos e seus status.</p>
 
         <div className="overflow-x-auto rounded-lg border container mx-auto px-1 py-1">
-          <table className="min-w-full bg-white">
+          <table>
             <thead className="bg-gray-50">
               <tr>
-                <th className="p-4 text-left text-sm font-semibold text-gray-600">Parcela</th>
-                <th className="p-4 text-left text-sm font-semibold text-gray-600">Referência</th>
-                <th className="p-4 text-left text-sm font-semibold text-gray-600">Vencimento</th>
-                <th className="p-4 text-left text-sm font-semibold text-gray-600">Valor</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-600">Número do Acordo</th>
                 <th className="p-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                <th className="p-4 text-left text-sm font-semibold text-gray-600">Data Pagamento</th>
-                <th className="p-4 text-left text-sm font-semibold text-gray-600">Ações</th>
-                <th className="p-4 text-left text-sm font-semibold text-gray-600">Ações</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-600">Total do Acordo</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-600">Data Prevista</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-600">Realizado Por</th>
+                <th className="p-4 text-left text-sm font-semibold text-gray-600">Data de Criação</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {mensalidades.map((m) => (
-                <tr key={m.id_mensalidade} className="hover:bg-gray-50">
-                  <td className="p-4 whitespace-nowrap text-sm text-gray-800">{m.parcela}</td>
-                  <td className="p-4 whitespace-nowrap text-sm text-gray-800">{m.referencia}</td>
-                  <td className="p-4 whitespace-nowrap text-sm text-gray-800">
-                    {new Date(m.vencimento).toLocaleDateString()}
-                  </td>
-                  <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    R$ {Number(m.valor_principal).toFixed(2)}
-                  </td>
+              {acordos.map((a) => (
+                <tr key={a.id_acordo}>
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-800">{a.id_acordo}</td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${m.status === 'P' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                      {m.status === 'P' ? 'Pago' : 'Aberto'}
+                    <span
+                      className={`px-2 py-1 text-xs font-semibold rounded-full ${a.status === 'Concluído'
+                        ? 'bg-green-100 text-green-800'
+                        : a.status === 'Quebra'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-blue-100 text-blue-800'
+                        }`}
+                    >
+                      {a.status}
                     </span>
                   </td>
+
+                  <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    R$ {Number(a.total_acordo).toFixed(2)}
+                  </td>
+
                   <td className="p-4 whitespace-nowrap text-sm text-gray-800">
-                    {m.data_pgto ? new Date(m.data_pgto).toLocaleDateString() : '-'}
+                    {new Date(a.data_prevista).toLocaleDateString()}
                   </td>
-                  <td className="p-4 whitespace-nowrap text-sm">
-                    <button className="text-blue-600 hover:underline">Editar</button>
+
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-800">
+                    {a.realizado_por}
                   </td>
+
+                  <td className="p-4 whitespace-nowrap text-sm text-gray-800">
+                    {new Date(a.dt_criacao).toLocaleDateString()}
+                  </td>
+
                   <td className="p-4 whitespace-nowrap text-sm">
-                    <button className="text-blue-600 hover:underline">Detalhes</button>
+                    <button
+                      onClick={() => handleVerDetalhes(a)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      Detalhes
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -110,6 +135,15 @@ export default function Home() {
         title="Criar Novo Acordo"
       >
         <FormularioCriarAcordo onAcordoCriado={handleAcordoCriado} />
+      </Modal>
+
+      <Modal
+        isOpen={modalDetalhesAberto}
+        onClose={handleFecharDetalhes}
+        title={`Detalhes do Acordo #${acordoSelecionado?.id_acordo}`}
+      >
+
+        {acordoSelecionado && <DetalhesAcordo acordo={acordoSelecionado} />}
       </Modal>
     </div>
   );
