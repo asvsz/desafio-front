@@ -41,7 +41,12 @@ const DetalhesAcordo = ({ acordo }: DetalhesAcordoProps) => {
     <div className="space-y-4">
       <div>
         <h3 className="text-sm font-medium text-gray-500">Status</h3>
-        <p className="mt-1 text-lg font-semibold">{acordo.status}</p>
+        <p
+          
+          className={`mt-1 text-lg font-semibold ${acordo.status === 'Concluído' ? 'text-green-600'
+          : acordo.status === 'Quebra' ? 'text-red-600' : 'text-blue-800'}`}>
+          {acordo.status}
+          </p>
       </div>
       <div>
         <h3 className="text-sm font-medium text-gray-500">Total do Acordo</h3>
