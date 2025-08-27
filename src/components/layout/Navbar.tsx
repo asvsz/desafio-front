@@ -23,10 +23,10 @@ const Navbar = () => {
               <p className="text-sm text-gray-500">Controle de Mensalidades e Acordos</p>
             </div>
           </div>
-          <div className="border-b border-gray-200 text-gray-900">
+          <div className=" text-gray-900">
             <nav className="-mb-px flex space-x-8">
-              <Link href="/">Mensalidades</Link>
-              <Link href="/acordos">Acordos</Link>
+              <Link className="border-b border-gray-200" href="/">Mensalidades</Link>
+              <Link className="border-b border-gray-200" href="/acordos">Acordos</Link>
             </nav>
           </div>
           <Button
